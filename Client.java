@@ -1,11 +1,36 @@
+import java.security.*;
+import javax.crypto.*;
+
 
 public class Client {
-	static int secret_num = 4 ;
-	static Encryption alice = new Encryption();
 	
-	public static double A = alice.Diffie_Helman(secret_num);
-	
-	public static void main (String [] args){
-		System.out.println(alice.Shared_key_Client());
+	public static KeyPair genKeys() throws Exception {
+        try {
+ 
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA"); 
+            kpg.initialize(1024);
+            KeyPair kp = kpg.generateKeyPair();
+            
+            return kp;
+            
+        }
+ 
+        catch (NoSuchAlgorithmException e) {
+ 
+            System.out.println("Exception thrown : " + e);
+        }
+		return null;
+		
+        
+    }
+	public static void main (String[] args) throws Exception {
+		
+		Server Alice = new Server();
+		PrivateKey privateKey = Alice.genKeys().getPrivate();
+		PublicKey publicKey = Alice.genKeys().getPublic();
+		System.out.println(publicKey);
+		System.out.println(privateKey);
 	}
+	
+	
 }
