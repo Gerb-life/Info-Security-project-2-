@@ -6,30 +6,47 @@ public class Server {
 	
 	public static KeyPair genKeys() throws Exception {
         try {
- 
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA"); 
-            kpg.initialize(1024);
+            kpg.initialize(2048);
             KeyPair kp = kpg.generateKeyPair();
             
-            return kp;
-            
+            return kp;      
         }
- 
         catch (NoSuchAlgorithmException e) {
- 
             System.out.println("Exception thrown : " + e);
         }
-		return null;
-		
-        
+		return null;     
     }
-	public static void main (String[] args) throws Exception {
+	
+	public static KeyPair Diffie() {
+		 try {
+	            KeyPairGenerator kpg = KeyPairGenerator.getInstance("DH"); 
+	            kpg.initialize(1024);
+	            KeyPair kp = kpg.generateKeyPair();
+	            
+	            return kp;       
+		 }
+	        catch (NoSuchAlgorithmException e) {
+	        	System.out.println("Exception thrown : " + e);
+	        }
+			return null;      
+	    }
+	
+	public static byte[] genSig(String string) throws InvalidKeyException, Exception {
+		Signature sig = Signature.getInstance("SHA256withRSA");
 		
-		Server Bob = new Server();
-		PrivateKey privateKey = Bob.genKeys().getPrivate();
-		PublicKey publicKey = Bob.genKeys().getPublic();
-		System.out.println(publicKey);
-		System.out.println(privateKey);
+		sig.initSign(genKeys().getPrivate());
+		
+		
+		
+		byte[] bytes = string.getBytes();
+		
+		sig.update(bytes);
+		
+		byte[] signature = sig.sign();
+		
+		return signature;
+		
 	}
 	
 	

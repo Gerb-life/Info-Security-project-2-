@@ -1,4 +1,6 @@
 import java.security.*;
+import java.util.Base64;
+
 import javax.crypto.*;
 
 
@@ -8,7 +10,7 @@ public class Client {
         try {
  
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA"); 
-            kpg.initialize(1024);
+            kpg.initialize(2048);
             KeyPair kp = kpg.generateKeyPair();
             
             return kp;
@@ -23,14 +25,49 @@ public class Client {
 		
         
     }
-	public static void main (String[] args) throws Exception {
+	public static KeyPair Diffie() {
+		 try {
+			 
+	            KeyPairGenerator kpg = KeyPairGenerator.getInstance("DH"); 
+	            kpg.initialize(1024);
+	            KeyPair kp = kpg.generateKeyPair();
+	            
+	            return kp;
+	            
+	        }
+	 
+	        catch (NoSuchAlgorithmException e) {
+	 
+	            System.out.println("Exception thrown : " + e);
+	        }
+			return null;
+			
+	        
+	    }
+	public static byte[] genSig(String string) throws InvalidKeyException, Exception {
+		Signature sig = Signature.getInstance("SHA256withRSA");
+		sig.initSign(genKeys().getPrivate());
 		
-		Server Alice = new Server();
-		PrivateKey privateKey = Alice.genKeys().getPrivate();
-		PublicKey publicKey = Alice.genKeys().getPublic();
-		System.out.println(publicKey);
-		System.out.println(privateKey);
+		byte[] bytes = string.getBytes();
+		
+		sig.update(bytes);
+		byte[] signature = sig.sign();
+		return signature;
+		
 	}
 	
+	public static String Encrypt(String string , PrivateKey key) throws GeneralSecurityException, NoSuchPaddingException {
+			
+			Cipher c = Cipher.getInstance("AES");
+			c.init(Cipher.ENCRYPT_MODE, key);
+			byte [] cipherText = c.doFinal(string.getBytes());
+			
+			return cipherText.toString();
+		
+			
+		
+	}
+	
+
 	
 }
