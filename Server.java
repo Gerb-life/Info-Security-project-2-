@@ -18,35 +18,53 @@ public class Server {
 		return null;     
     }
 	
-	public static KeyPair Diffie() {
-		 try {
-	            KeyPairGenerator kpg = KeyPairGenerator.getInstance("DH"); 
-	            kpg.initialize(1024);
-	            KeyPair kp = kpg.generateKeyPair();
-	            
-	            return kp;       
-		 }
-	        catch (NoSuchAlgorithmException e) {
-	        	System.out.println("Exception thrown : " + e);
-	        }
-			return null;      
-	    }
+		public static byte[] Diffie(PrivateKey priv , PublicKey pub) throws Exception {
+			
+			KeyAgreement key = KeyAgreement.getInstance("DiffieHellman");
+			key.init(priv);
+			key.doPhase(pub, true);
+			byte[] secret = key.generateSecret();
+			return secret ;
+			
+		}
 	
-	public static byte[] genSig(String string) throws InvalidKeyException, Exception {
+	public static byte[] genSig(String string) throws  Exception {
 		Signature sig = Signature.getInstance("SHA256withRSA");
-		
 		sig.initSign(genKeys().getPrivate());
-		
-		
 		
 		byte[] bytes = string.getBytes();
 		
 		sig.update(bytes);
-		
 		byte[] signature = sig.sign();
-		
 		return signature;
 		
+	}
+	
+	public static SecretKey getEncryptionKey() throws Exception { 
+		KeyGenerator gen = KeyGenerator.getInstance("AES");
+		gen.init(128);
+		SecretKey secKey = gen.generateKey();
+		return secKey;
+	}
+	
+	public static byte []  Encrypt(String string, SecretKey secKey) throws Exception {
+		
+		Cipher c = Cipher.getInstance("AES");
+		
+		c.init(Cipher.ENCRYPT_MODE, secKey);
+		byte [] plainText = string.getBytes();
+		byte [] cipherText = c.doFinal(plainText);
+		
+		return cipherText;
+	
+		
+	
+}
+	public static String Decrypt(byte[] cipherText , SecretKey secKey) throws Exception{
+		Cipher c = Cipher.getInstance("AES");
+		c.init(Cipher.DECRYPT_MODE, secKey);
+		byte[] plainText = c.doFinal(cipherText);
+		return new String(plainText);
 	}
 	
 	
